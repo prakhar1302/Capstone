@@ -5,35 +5,44 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    
-            
-        <div class="card">
-            <h1>Capstone 2024</h1>
-            <h3>PTM Classification of Protein Phosphorylation :</h3>
-            <form action="/predict" method="post">
-                <label for="sequence">Enter Sequence:</label>
-                <input type="text" id="sequence" name="sequence" required><br><br>
-                <input type="submit" value="Predict">
-            </form>
-            <div id="result"></div>
-            <footer>Developed by Prakhar Sharma MT23060 under the supervision of Dr. N Arul Murugan</footer>
-        </div>
-    
-    
+    <div class="card">
+        <h1>Capstone 2024</h1>
+        <h3>PTM prediction in Protein Phosphorylation</h3>
+        <form id="predictionForm">
+            <label for="sequence">Enter Sequence (Length is 15)</label>
+            <input type="text" id="sequence" name="sequence" required><br><br>
+            <input type="submit" value="Predict">
+        </form>
+        <div id="result"></div>
+        <footer>
+            Developed by Prakhar Sharma MT23060 under the supervision of Dr. N Arul Murugan
+            <img src="{{ url_for('static', filename='iiitd_logo_footer.png') }}" alt="Supervisor">
+        </footer>
+    </div>
 
     <script>
-        const form = document.querySelector('form');
-        form.addEventListener('submit', async (event) => {
+        document.getElementById('predictionForm').addEventListener('submit', async (event) => {
             event.preventDefault();
 
-            const formData = new FormData(form);
+            const sequence = document.getElementById('sequence').value;
+
             const response = await fetch('/predict', {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `sequence=${sequence}`
             });
 
             const result = await response.json();
-            document.getElementById('result').innerText = `Prediction: ${result.prediction}`;
+            if (result.error) {
+                document.getElementById('result').innerText = `Error: ${result.error}`;
+            } else {
+                document.getElementById('result').innerText = `Prediction: ${result.prediction}`;
+            }
+
+            // Clear the input field after submission
+            document.getElementById('sequence').value = '';
         });
     </script>
 </body>

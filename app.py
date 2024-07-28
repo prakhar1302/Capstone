@@ -18,6 +18,14 @@ def compute_dpc(sequence):
     dpc_vector = [dpc_counts[dipeptide] for dipeptide in dipeptides]
     return dpc_vector
 
+# Define the function to preprocess the sequence
+def preprocess_sequence(sequence):
+    sequence = sequence.strip()  # Remove spaces from front and end
+    if len(sequence) != 15:
+        return None, "Sequence length must be exactly 15 characters."
+    sequence = sequence.upper()  # Convert to uppercase
+    return sequence, None
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -25,6 +33,11 @@ def home():
 @app.route('/predict', methods=['POST'])
 def predict():
     sequence = request.form['sequence']
+    sequence, error = preprocess_sequence(sequence)
+    
+    if error:
+        return jsonify({'error': error})
+    
     dpc_vector = compute_dpc(sequence)
     dpc_vector = np.array(dpc_vector).reshape(1, -1)
     
